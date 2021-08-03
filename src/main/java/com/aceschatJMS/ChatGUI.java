@@ -1,7 +1,5 @@
 package com.aceschatJMS;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 import javax.jms.JMSException;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -13,7 +11,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-public class TestGUI extends JFrame implements Runnable {
+public class ChatGUI extends JFrame implements Runnable {
   private static final String APP_TOPIC = "jms.samples.chat";
   private static final String DEFAULT_USER = "Chatter";
   private static final String DEFAULT_BROKER_NAME = "tcp://localhost:61616";
@@ -32,21 +30,23 @@ public class TestGUI extends JFrame implements Runnable {
   private JMenu settingMenu;
   private JMenuBar mainMenu;
 
+  private Thread threadGUI;
+
   private String username;
   private String password;
   private String broker;
 
-  private DefaultListModel<Chat> topics;
-  private DefaultListModel<String> str;
-  private Chat currentConversation;
-
-  private Thread threadGUI;
+  private DefaultListModel<ChatComm> topics;
+  private ChatComm currentConversation;
 
   private javax.jms.Connection connect = null;
   private javax.jms.Session pubSession = null;
   private javax.jms.Session subSession = null;
 
-  public TestGUI() {
+  private ChatControlComm chatControlComm;
+
+  public ChatGUI(ChatControlComm chatControlComm) {
+    this.chatControlComm = chatControlComm;
     threadGUI = new Thread(this, "GUIThread");
     threadGUI.start();
   }
@@ -83,7 +83,9 @@ public class TestGUI extends JFrame implements Runnable {
               password = DEFAULT_PASSWORD;
             }
             System.out.println("$ Connecting " + username + " to " +  broker);
+            //TODO: Add listener
 
+            /*
             try {
               javax.jms.ConnectionFactory factory;
               factory = new ActiveMQConnectionFactory(username, password, broker);
@@ -96,12 +98,13 @@ public class TestGUI extends JFrame implements Runnable {
               jmse.printStackTrace();
               System.exit(1);
             }
+
+             */
           }
         });
 
     //Setting JList Model
     topics = new DefaultListModel<>();
-    str = new DefaultListModel<>();
     topicList.setModel(topics);
 
     topicList.getSelectionModel()
@@ -109,9 +112,11 @@ public class TestGUI extends JFrame implements Runnable {
             new ListSelectionListener() {
               @Override
               public void valueChanged(ListSelectionEvent e) {
-                Chat c = (Chat) topicList.getSelectedValue();
+                ChatComm c = (ChatComm) topicList.getSelectedValue();
                 newChat(c.getAppTopic(), c.getConversation());
                 currentConversation = c;
+
+                //add getChatComm from ChatControl
               }
             });
 
@@ -120,8 +125,10 @@ public class TestGUI extends JFrame implements Runnable {
           @Override
           public void actionPerformed(ActionEvent e) {
             String topic = JOptionPane.showInputDialog("Enter Topic");
-            currentConversation = new Chat(username, topic, connect, pubSession, subSession);
+            currentConversation = new ChatComm(username, topic, connect, pubSession, subSession);
             topics.addElement(currentConversation);
+
+            //add createTopicChat
           }
         });
 
@@ -134,10 +141,11 @@ public class TestGUI extends JFrame implements Runnable {
               } catch (JMSException jmsException) {
                 jmsException.printStackTrace();
               }
-              // printConsole(typingArea.getText());
               System.out.println(typingArea.getText());
               typingArea.setText("");
             }
+
+            //add sendMessage
           }
         });
   }

@@ -1,21 +1,23 @@
 package com.aceschatJMS;
 
 import javax.swing.*;
-import java.util.Scanner;
 
 public class Main {
-  public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+  public static void main(String[] args)
+      throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException,
+          IllegalAccessException {
+    /*
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     SwingUtilities.invokeLater(
             new Runnable() {
               @Override
               public void run() {
-                TestGUI testGUI = new TestGUI();
-                testGUI.setVisible(true);
+                ChatGUI chatGUI = new ChatGUI();
+                chatGUI.setVisible(true);
               }
             });
 
-    /*
+
     while (true) {
       System.out.print("$ ");
       String text = scanner.nextLine();
@@ -24,5 +26,8 @@ public class Main {
       }
     }
      */
+    ChatControlComm chatControlComm = new ChatControlCommImpl();
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    ChatGUI chatGUI = new ChatGUI(chatControlComm);
   }
 }

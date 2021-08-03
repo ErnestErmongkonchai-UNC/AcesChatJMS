@@ -1,12 +1,10 @@
 package com.aceschatJMS;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-
 import javax.jms.JMSException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Chat implements javax.jms.MessageListener{
+public class ChatComm implements javax.jms.MessageListener{
 
   private static final String APP_TOPIC = "jms.samples.chat";
   private static final String DEFAULT_USER = "Chatter";
@@ -22,7 +20,7 @@ public class Chat implements javax.jms.MessageListener{
   private String newTopic;
   private List<String> conversation;
 
-  public Chat(String username, String newTopic, javax.jms.Connection connect, javax.jms.Session pubSession, javax.jms.Session subSession) {
+  public ChatComm(String username, String newTopic, javax.jms.Connection connect, javax.jms.Session pubSession, javax.jms.Session subSession) {
     this.username = username;
     this.newTopic = newTopic;
     this.connect = connect;
