@@ -7,45 +7,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatTopic {
-    private javax.jms.MessageConsumer subscriber;
-    private javax.jms.MessageProducer publisher;
-    private javax.jms.Topic topic;
+  private javax.jms.MessageConsumer subscriber;
+  private javax.jms.MessageProducer publisher;
+  private javax.jms.Topic topic;
 
-    private List<String> conversation;
+  private String topicName;
+  private List<String> conversation;
 
-    public ChatTopic(javax.jms.Topic topic, javax.jms.MessageConsumer subscriber, javax.jms.MessageProducer publisher) {
-        this.topic = topic;
-        this.subscriber = subscriber;
-        this.publisher = publisher;
-        this.conversation = new ArrayList<>();
-    }
+  public ChatTopic(
+      String topicName,
+      javax.jms.Topic topic,
+      javax.jms.MessageConsumer subscriber,
+      javax.jms.MessageProducer publisher) {
+    this.topicName = topicName;
+    this.topic = topic;
+    this.subscriber = subscriber;
+    this.publisher = publisher;
+    this.conversation = new ArrayList<>();
+  }
 
-    public MessageConsumer getSubscriber() {
-        return subscriber;
-    }
+  public MessageConsumer getSubscriber() {
+    return subscriber;
+  }
 
-    public void setSubscriber(MessageConsumer subscriber) {
-        this.subscriber = subscriber;
-    }
+  public MessageProducer getPublisher() {
+    return publisher;
+  }
 
-    public MessageProducer getPublisher() {
-        return publisher;
-    }
+  public Topic getTopic() {
+    return topic;
+  }
 
-    public void setPublisher(MessageProducer publisher) {
-        this.publisher = publisher;
-    }
+  public String getTopicName() {
+    return topicName;
+  }
 
-    public Topic getTopic() {
-        return topic;
-    }
+  public List<String> getConversation() {
+    return conversation;
+  }
 
-    public void setTopic(Topic topic) {
-        this.topic = topic;
-    }
-
-    //TODO: add sender name (Ernest: ____)
-    public void addMessage(String message) {
-        conversation.add(message);
-    }
+  // TODO: add sender name (Ernest: ____)
+  public void addMessage(String message) {
+    System.out.println("sending(addMessage): " + message);
+    conversation.add(message);
+  }
 }

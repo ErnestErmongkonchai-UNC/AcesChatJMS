@@ -32,21 +32,12 @@ public class ChatGUI extends JFrame implements Runnable {
 
   private Thread threadGUI;
 
-  private String username;
-  private String password;
-  private String broker;
+  private DefaultListModel<String> topics;
+  //private String currentConversation;
 
-  private DefaultListModel<ChatComm> topics;
-  private ChatComm currentConversation;
+  private ChatControlComm chatControlComm = null;
 
-  private javax.jms.Connection connect = null;
-  private javax.jms.Session pubSession = null;
-  private javax.jms.Session subSession = null;
-
-  private ChatControlComm chatControlComm;
-
-  public ChatGUI(ChatControlComm chatControlComm) {
-    this.chatControlComm = chatControlComm;
+  public ChatGUI() {
     threadGUI = new Thread(this, "GUIThread");
     threadGUI.start();
   }
@@ -73,9 +64,9 @@ public class ChatGUI extends JFrame implements Runnable {
           @Override
           public void actionPerformed(ActionEvent e) {
             // Create a connection.
-            broker = JOptionPane.showInputDialog("Enter Broker");
-            username = JOptionPane.showInputDialog("Enter Username");
-            password = JOptionPane.showInputDialog("Enter Password");
+            String broker = JOptionPane.showInputDialog("Enter Broker");
+            String username = JOptionPane.showInputDialog("Enter Username");
+            String password = JOptionPane.showInputDialog("Enter Password");
             if (broker.equals("")) {
               broker = DEFAULT_BROKER_NAME;
             }
@@ -83,27 +74,27 @@ public class ChatGUI extends JFrame implements Runnable {
               password = DEFAULT_PASSWORD;
             }
             System.out.println("$ Connecting " + username + " to " +  broker);
-            //TODO: Add listener
 
-            /*
-            try {
-              javax.jms.ConnectionFactory factory;
-              factory = new ActiveMQConnectionFactory(username, password, broker);
-              connect = factory.createConnection(username, password);
-              pubSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-              subSession = connect.createSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
-              System.out.println("$ Connected successfully!");
-            } catch (javax.jms.JMSException jmse) {
-              System.err.println("error: Cannot connect to Broker - " + broker);
-              jmse.printStackTrace();
-              System.exit(1);
-            }
-
-             */
+            // Notify Communications Controller of new broker
+            chatControlComm.connectBroker(broker, username, password);
           }
         });
 
-    //Setting JList Model
+    addPeerButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            String topic = JOptionPane.showInputDialog("Enter Topic");
+            // if topic is new then add to JList
+            if (!chatControlComm.topicExists(topic)) {
+              topics.addElement(topic);
+            }
+            // process topic
+            chatControlComm.connectTopic(topic);
+          }
+        });
+
+    // Setting JList Model
     topics = new DefaultListModel<>();
     topicList.setModel(topics);
 
@@ -112,45 +103,29 @@ public class ChatGUI extends JFrame implements Runnable {
             new ListSelectionListener() {
               @Override
               public void valueChanged(ListSelectionEvent e) {
-                ChatComm c = (ChatComm) topicList.getSelectedValue();
-                newChat(c.getAppTopic(), c.getConversation());
-                currentConversation = c;
+                String topicName = (String) topicList.getSelectedValue();
 
-                //add getChatComm from ChatControl
+                chatControlComm.connectTopic(topicName);
               }
             });
-
-    addPeerButton.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            String topic = JOptionPane.showInputDialog("Enter Topic");
-            currentConversation = new ChatComm(username, topic, connect, pubSession, subSession);
-            topics.addElement(currentConversation);
-
-            //add createTopicChat
-          }
-        });
 
     typingArea.addKeyListener(
         new KeyAdapter() {
           public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
               try {
-                currentConversation.postMessage(typingArea.getText());
+                chatControlComm.sendMessage(typingArea.getText());
               } catch (JMSException jmsException) {
                 jmsException.printStackTrace();
               }
               System.out.println(typingArea.getText());
               typingArea.setText("");
             }
-
-            //add sendMessage
           }
         });
   }
 
-  public void newChat(String topic, List<String> conversation) {
+  public void newChatConversation(String topic, List<String> conversation) {
     chatName.setText(topic);
     conversationArea.setText("");
     for (int i = 0; i < conversation.size(); i++) {
@@ -164,4 +139,7 @@ public class ChatGUI extends JFrame implements Runnable {
     conversationArea.setCaretPosition(conversationArea.getDocument().getLength());
   }
 
+  public void addControlListener(ChatControlComm chatAdd) {
+    chatControlComm = chatAdd;
+  }
 }

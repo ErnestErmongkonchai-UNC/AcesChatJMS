@@ -3,7 +3,6 @@ package com.aceschatJMS;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.JMSException;
-import java.util.List;
 
 public class ChatCommunication implements javax.jms.MessageListener {
   private static final String APP_TOPIC = "jms.samples.chat";
@@ -15,17 +14,9 @@ public class ChatCommunication implements javax.jms.MessageListener {
   private javax.jms.Session pubSession = null;
   private javax.jms.Session subSession = null;
 
-  private String broker;
-  private String username;
-  private String password;
-
   public ChatCommunication() {}
 
   public void connectToBroker(String broker, String username, String password) {
-    this.broker = broker;
-    this.username = username;
-    this.password = password;
-
     try {
       javax.jms.ConnectionFactory factory;
       factory = new ActiveMQConnectionFactory(username, password, broker);
@@ -46,9 +37,10 @@ public class ChatCommunication implements javax.jms.MessageListener {
       javax.jms.MessageConsumer subscriber = subSession.createConsumer(topic);
       subscriber.setMessageListener(this);
       javax.jms.MessageProducer publisher = pubSession.createProducer(topic);
-      return new ChatTopic(topic, subscriber, publisher);
+      connect.start();
+      // TODO: connection error case
+      return new ChatTopic(newTopic, topic, subscriber, publisher);
       // TODO: connect to server to create topic
-      // connect.start();
     } catch (javax.jms.JMSException jmse) {
       jmse.printStackTrace();
     }
@@ -58,7 +50,7 @@ public class ChatCommunication implements javax.jms.MessageListener {
 
   public void postMessage(ChatTopic topic, String message) throws JMSException {
     javax.jms.TextMessage msg = pubSession.createTextMessage();
-    msg.setText(username + ": " + message);
+    msg.setText(message);
     topic.getPublisher().send(msg);
   }
 
@@ -174,17 +166,5 @@ public class ChatCommunication implements javax.jms.MessageListener {
     use.append("               Default password: " + DEFAULT_PASSWORD + "\n");
     use.append("  -h           This help screen.\n");
     System.err.println(use);
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public String getBroker() {
-    return broker;
-  }
-
-  public String getPassword() {
-    return password;
   }
 }

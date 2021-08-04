@@ -16,18 +16,20 @@ public class Main {
                 chatGUI.setVisible(true);
               }
             });
-
-
-    while (true) {
-      System.out.print("$ ");
-      String text = scanner.nextLine();
-      if(text.equals("quit")) {
-        break;
-      }
-    }
      */
-    ChatControlComm chatControlComm = new ChatControlCommImpl();
+
+    ChatDatabase chatDatabase = new ChatDatabase();
+
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    ChatGUI chatGUI = new ChatGUI(chatControlComm);
+    ChatGUI chatGUI = new ChatGUI();
+    chatGUI.setVisible(true);
+
+    ChatCommunication chatCommunication = new ChatCommunication();
+
+    ChatControlComm chatControlComm = new ChatControlCommImpl(chatDatabase, chatCommunication);
+
+    chatGUI.addControlListener(chatControlComm);
+
+    ChatControlGUI chatControlGUI = new ChatControlGUIImpl(chatDatabase, chatGUI);
   }
 }

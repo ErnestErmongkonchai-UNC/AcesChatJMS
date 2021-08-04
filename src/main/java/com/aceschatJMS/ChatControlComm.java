@@ -1,6 +1,7 @@
 package com.aceschatJMS;
 
 import javax.jms.JMSException;
+import java.util.List;
 
 public interface ChatControlComm {
     void connectBroker(String broker, String username, String password);
@@ -9,5 +10,7 @@ public interface ChatControlComm {
 
     void sendMessage(String message) throws JMSException;
 
-    void setActiveTopic(String topic);
+    boolean topicExists(String topic);
+
+    String getActiveTopic();
 }

@@ -1,66 +1,60 @@
 package com.aceschatJMS;
 
 import javax.jms.JMSException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class ChatControlCommImpl implements ChatControlComm {
-    private ChatCommunication serverConnection;
-    private ChatGUI chatGUI;
+  private ChatCommunication serverConnection;
+  private ChatDatabase chatDatabase;
 
-    private List<ChatTopic> chatTopicList;
-    private ChatTopic activeTopic;
+  public ChatControlCommImpl(ChatDatabase chatDatabase, ChatCommunication chatCommunication) {
+    this.serverConnection = chatCommunication;
+    this.chatDatabase = chatDatabase;
+  }
 
-    public ChatControlCommImpl(){
-        serverConnection = new ChatCommunication();
-        chatTopicList = new ArrayList<>();
-        /*
-        SwingUtilities.invokeLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        ChatGUI chatGUI = new ChatGUI();
-                        ChatCommunication serverConnection = new ChatCommunication();
-                        chatGUI.setVisible(true);
-                    }
-                });
+  @Override
+  public void connectBroker(String broker, String username, String password) {
+    chatDatabase.setBroker(broker);
+    chatDatabase.setUsername(username);
+    chatDatabase.setPassword(password);
+    serverConnection.connectToBroker(broker, username, password);
+  }
 
-         */
+  @Override
+  public void connectTopic(String topicName) {
+    // TODO: return true or false error case
+    if (chatDatabase.getActiveTopic() != null
+        && topicName.equals(chatDatabase.getActiveTopic().getTopicName())) {
+      return;
+    } else {
+      // Check if topicName exists
+      if (chatDatabase.topicExists(topicName)) {
+        // topicName exists, set active
+        chatDatabase.setActiveTopic(topicName);
+        // TODO: read existing conversation
+      } else {
+        // doesn't exist, create new topic and set active
+        chatDatabase.addTopic(serverConnection.connectToTopic(topicName));
+
+        chatDatabase.setActiveTopic(topicName);
+        // TODO: create new conversation
+      }
     }
+  }
 
-    @Override
-    public void connectBroker(String broker, String username, String password) {
-        serverConnection.connectToBroker(broker, username, password);
-    }
+  @Override
+  public void sendMessage(String message) throws JMSException {
+    String msg = chatDatabase.getUsername() + ": " + message;
+    chatDatabase.getActiveTopic().addMessage(msg);
+    serverConnection.postMessage(chatDatabase.getActiveTopic(), msg);
+  }
 
-    @Override
-    public void connectTopic(String topicName) {
-        if(topicName.equals(activeTopic.getTopic().toString())) {
-            return;
-        }
-        for (ChatTopic topic : chatTopicList) {
-            if (chatTopicList.toString().equals(topicName)) {
-                setActiveTopic(topicName);
-                return;
-            }
-        }
-        chatTopicList.add(serverConnection.connectToTopic(topicName));
-        setActiveTopic(topicName);
-    }
+  @Override
+  public boolean topicExists(String topic) {
+    return chatDatabase.topicExists(topic);
+  }
 
-    @Override
-    public void sendMessage(String message) throws JMSException {
-        serverConnection.postMessage(activeTopic, message);
-    }
-
-    @Override
-    public void setActiveTopic(String topicName) {
-        for(ChatTopic topic : chatTopicList) {
-            if(topic.getTopic().toString().equals(topicName)) {
-                activeTopic = topic;
-            }
-        }
-        //TODO: refresh GUI convo screen
-    }
+  @Override
+  public String getActiveTopic() {
+    return chatDatabase.getActiveTopic().getTopicName();
+  }
 }
