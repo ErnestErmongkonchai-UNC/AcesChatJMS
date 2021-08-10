@@ -30,21 +30,19 @@ public class ChatControlCommImpl implements ChatControlComm {
       if (chatDatabase.topicExists(topicName)) {
         // topicName exists, set active
         chatDatabase.setActiveTopic(topicName);
-        // TODO: read existing conversation
+        serverConnection.printSelectedTopic();
       } else {
         // doesn't exist, create new topic and set active
         chatDatabase.addTopic(serverConnection.connectToTopic(topicName));
-
         chatDatabase.setActiveTopic(topicName);
-        // TODO: create new conversation
+        serverConnection.printSelectedTopic();
       }
     }
   }
 
   @Override
   public void sendMessage(String message) throws JMSException {
-    String msg = chatDatabase.getUsername() + ": " + message;
-    chatDatabase.getActiveTopic().addMessage(msg);
+    String msg = chatDatabase.getUsername() + ": " + message + "\n\r";
     serverConnection.postMessage(chatDatabase.getActiveTopic(), msg);
   }
 

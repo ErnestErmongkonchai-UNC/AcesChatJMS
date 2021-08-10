@@ -31,5 +31,7 @@ public class Main {
     chatGUI.addControlListener(chatControlComm);
 
     ChatControlGUI chatControlGUI = new ChatControlGUIImpl(chatDatabase, chatGUI);
+
+    chatCommunication.addControlListener(chatControlGUI);
   }
 }

@@ -46,9 +46,7 @@ public class ChatTopic {
     return conversation;
   }
 
-  // TODO: add sender name (Ernest: ____)
   public void addMessage(String message) {
-    System.out.println("sending(addMessage): " + message);
     conversation.add(message);
   }
 }

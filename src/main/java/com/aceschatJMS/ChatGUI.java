@@ -33,7 +33,6 @@ public class ChatGUI extends JFrame implements Runnable {
   private Thread threadGUI;
 
   private DefaultListModel<String> topics;
-  //private String currentConversation;
 
   private ChatControlComm chatControlComm = null;
 
@@ -104,7 +103,6 @@ public class ChatGUI extends JFrame implements Runnable {
               @Override
               public void valueChanged(ListSelectionEvent e) {
                 String topicName = (String) topicList.getSelectedValue();
-
                 chatControlComm.connectTopic(topicName);
               }
             });
@@ -118,7 +116,6 @@ public class ChatGUI extends JFrame implements Runnable {
               } catch (JMSException jmsException) {
                 jmsException.printStackTrace();
               }
-              System.out.println(typingArea.getText());
               typingArea.setText("");
             }
           }
@@ -135,7 +132,7 @@ public class ChatGUI extends JFrame implements Runnable {
   }
 
   public void printConsole(String message) {
-    conversationArea.append(message + "\n\r");
+    conversationArea.append(message);
     conversationArea.setCaretPosition(conversationArea.getDocument().getLength());
   }
 

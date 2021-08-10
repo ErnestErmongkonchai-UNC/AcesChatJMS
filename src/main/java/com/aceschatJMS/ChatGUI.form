@@ -40,6 +40,7 @@
               <component id="41754" class="javax.swing.JList" binding="topicList">
                 <constraints/>
                 <properties>
+                  <foreground color="-9999764"/>
                   <model/>
                 </properties>
               </component>
@@ -52,7 +53,7 @@
             <properties>
               <background color="-12763327"/>
               <foreground color="-12763327"/>
-              <text value="Add Peer"/>
+              <text value="Add Friend"/>
             </properties>
           </component>
         </children>

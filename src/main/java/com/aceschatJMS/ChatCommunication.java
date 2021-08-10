@@ -14,6 +14,8 @@ public class ChatCommunication implements javax.jms.MessageListener {
   private javax.jms.Session pubSession = null;
   private javax.jms.Session subSession = null;
 
+  private ChatControlGUI chatControlGUI = null;
+
   public ChatCommunication() {}
 
   public void connectToBroker(String broker, String username, String password) {
@@ -49,9 +51,14 @@ public class ChatCommunication implements javax.jms.MessageListener {
   }
 
   public void postMessage(ChatTopic topic, String message) throws JMSException {
+    message = topic.getTopicName() + " " + message;
     javax.jms.TextMessage msg = pubSession.createTextMessage();
     msg.setText(message);
     topic.getPublisher().send(msg);
+  }
+
+  public void printSelectedTopic() {
+    chatControlGUI.printActiveTopic();
   }
 
   /** Handle the message (as specified in the javax.jms.MessageListener interface). */
@@ -65,7 +72,10 @@ public class ChatCommunication implements javax.jms.MessageListener {
       // message and prints it to the standard output.
       try {
         String string = textMessage.getText();
-        // conversation.add(string);
+        String topicName = string.substring(0, string.indexOf(' '));
+        String message = string.substring(string.indexOf(' ') + 1);
+        chatControlGUI.printChatTopic(topicName, message);
+
         System.out.println(string);
       } catch (javax.jms.JMSException jmse) {
         jmse.printStackTrace();
@@ -166,5 +176,9 @@ public class ChatCommunication implements javax.jms.MessageListener {
     use.append("               Default password: " + DEFAULT_PASSWORD + "\n");
     use.append("  -h           This help screen.\n");
     System.err.println(use);
+  }
+
+  public void addControlListener(ChatControlGUI chatAdd) {
+    chatControlGUI = chatAdd;
   }
 }
