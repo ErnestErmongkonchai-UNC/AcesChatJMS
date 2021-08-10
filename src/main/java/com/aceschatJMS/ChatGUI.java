@@ -136,6 +136,10 @@ public class ChatGUI extends JFrame implements Runnable {
     conversationArea.setCaretPosition(conversationArea.getDocument().getLength());
   }
 
+  public void addTopicList(String topicName) {
+    topics.addElement(topicName);
+  }
+
   public void addControlListener(ChatControlComm chatAdd) {
     chatControlComm = chatAdd;
   }

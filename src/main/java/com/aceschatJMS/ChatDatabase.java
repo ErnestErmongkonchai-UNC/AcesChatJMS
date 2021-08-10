@@ -1,11 +1,14 @@
 package com.aceschatJMS;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ChatDatabase {
   private List<ChatTopic> chatTopicList;
   private ChatTopic activeTopic;
+  private File conversationsFile;
 
   private String broker;
   private String username;
@@ -14,6 +17,7 @@ public class ChatDatabase {
   public ChatDatabase() {
     this.chatTopicList = new ArrayList<>();
     this.activeTopic = null;
+    this.conversationsFile = null;
   }
 
   public void addTopic(ChatTopic topic) {
@@ -43,6 +47,25 @@ public class ChatDatabase {
       if(topic.getTopicName().equals(topicName)) return true;
     }
     return false;
+  }
+
+  public File getConversationsFile() {
+    return conversationsFile;
+  }
+
+  public void setConversationsFile(File conversationsFile) {
+    this.conversationsFile = conversationsFile;
+  }
+
+  public void addMessageToFile(String message) {
+    try {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(conversationsFile.getAbsolutePath(), true));
+      writer.append(message);
+      writer.close();
+      System.out.println("& Message written to file");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public String getBroker() {

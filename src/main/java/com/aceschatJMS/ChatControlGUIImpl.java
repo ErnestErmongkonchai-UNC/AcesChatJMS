@@ -21,6 +21,7 @@ public class ChatControlGUIImpl implements ChatControlGUI{
         for(ChatTopic topic : chatDatabase.getChatTopicList()) {
             if(topic.getTopicName().equals(topicName)) {
                 topic.addMessage(message);
+                chatDatabase.addMessageToFile(topicName + " " + message);
             }
         }
         if(chatDatabase.getActiveTopic().getTopicName().equals(topicName)) {
@@ -31,5 +32,10 @@ public class ChatControlGUIImpl implements ChatControlGUI{
     @Override
     public void printActiveTopic() {
         chatGUI.newChatConversation(chatDatabase.getActiveTopic().getTopicName(), chatDatabase.getActiveTopic().getConversation());
+    }
+
+    @Override
+    public void addToTopicList(String topicName) {
+        chatGUI.addTopicList(topicName);
     }
 }

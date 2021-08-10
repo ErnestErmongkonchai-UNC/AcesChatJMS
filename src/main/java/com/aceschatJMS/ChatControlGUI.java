@@ -8,4 +8,6 @@ public interface ChatControlGUI {
     void printChatTopic(String topicName, String message);
 
     void printActiveTopic();
+
+    void addToTopicList(String topicName);
 }

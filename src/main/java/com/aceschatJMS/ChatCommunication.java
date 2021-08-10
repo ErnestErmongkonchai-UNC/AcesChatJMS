@@ -61,6 +61,10 @@ public class ChatCommunication implements javax.jms.MessageListener {
     chatControlGUI.printActiveTopic();
   }
 
+  public void addToTopicList(String topicName) {
+    chatControlGUI.addToTopicList(topicName);
+  }
+
   /** Handle the message (as specified in the javax.jms.MessageListener interface). */
   @Override
   public void onMessage(javax.jms.Message aMessage) {
